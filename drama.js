@@ -48,8 +48,8 @@ router.get('/', async (req, res) => {
         id: drama.id || drama.bookId || `drama_${index + 1}`,
         title: drama.title || drama.bookTitle || `Drama Title ${index + 1}`,
         description: drama.description || drama.intro || 'A captivating story that will keep you entertained...',
-        thumbnail: drama.thumbnail || drama.cover || drama.bookCover,
-        banner: drama.banner || drama.bigCover || drama.thumbnail || drama.cover,
+        thumbnail: drama.thumbnail || drama.cover || drama.bookCover || drama.poster || dramaboxHelper.getRandomDramaImage(),
+        banner: drama.banner || drama.bigCover || drama.largeCover || drama.thumbnail || drama.cover || dramaboxHelper.getRandomDramaBanner(),
         genre: drama.genre || drama.tag || ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
         country: drama.country || 'South Korea',
         year: drama.year || (2020 + Math.floor(Math.random() * 4)),
@@ -61,14 +61,14 @@ router.get('/', async (req, res) => {
       }));
     }
     
-    // If no data from API, use fallback mock data
+    // If no data from API, use fallback mock data with good images
     if (dramalist.length === 0) {
       dramalist = Array.from({ length: Math.min(parseInt(limit), 20) }, (_, index) => ({
         id: `drama_${(parseInt(page) - 1) * parseInt(limit) + index + 1}`,
         title: `Drama Title ${index + 1}`,
         description: 'A captivating story that will keep you entertained...',
-        thumbnail: null, // No example.com URLs
-        banner: null,
+        thumbnail: dramaboxHelper.getRandomDramaImage(),
+        banner: dramaboxHelper.getRandomDramaBanner(),
         genre: ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
         country: 'South Korea',
         year: 2020 + Math.floor(Math.random() * 4),
@@ -163,7 +163,7 @@ router.get('/:id', async (req, res) => {
           id: index + 1,
           title: `Episode ${index + 1}`,
           duration: `${Math.floor(Math.random() * 20) + 40}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
-          thumbnail: null, // Remove example.com URL
+          thumbnail: dramaboxHelper.getRandomDramaImage(),
           releaseDate: new Date(2023, 0, index + 1).toISOString(),
           views: Math.floor(Math.random() * 100000) + 5000
         }))

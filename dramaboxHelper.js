@@ -141,8 +141,8 @@ class DramaBoxHelper {
               id: drama.id || drama.bookId,
               title: drama.title || drama.bookTitle,
               description: drama.description || drama.intro || 'No description available',
-              thumbnail: drama.thumbnail || drama.cover || drama.bookCover,
-              banner: drama.banner || drama.bigCover || drama.thumbnail || drama.cover,
+              thumbnail: drama.thumbnail || drama.cover || drama.bookCover || drama.poster || this.getRandomDramaImage(),
+              banner: drama.banner || drama.bigCover || drama.largeCover || drama.thumbnail || drama.cover || this.getRandomDramaBanner(),
               genre: drama.genre || drama.tag || 'Drama',
               country: drama.country || 'Unknown',
               year: drama.year || new Date().getFullYear(),
@@ -155,15 +155,15 @@ class DramaBoxHelper {
         }
       }
       
-      // If not found in theater, return fallback data
+      // If not found in theater, return fallback data with good images
       return {
         success: true,
         data: {
           id: dramaId,
           title: `Drama ${dramaId}`,
           description: 'Drama details will be available soon...',
-          thumbnail: null,
-          banner: null,
+          thumbnail: this.getRandomDramaImage(),
+          banner: this.getRandomDramaBanner(),
           genre: 'Drama',
           country: 'Unknown',
           year: new Date().getFullYear(),
@@ -181,6 +181,30 @@ class DramaBoxHelper {
         status: 500
       };
     }
+  }
+
+  // Get random drama image for fallback
+  getRandomDramaImage() {
+    const images = [
+      'https://images.unsplash.com/photo-1489599088243-6f0b99066ce8?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1478720568477-b0e6f1e6888c?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop'
+    ];
+    return images[Math.floor(Math.random() * images.length)];
+  }
+
+  // Get random drama banner for fallback
+  getRandomDramaBanner() {
+    const banners = [
+      'https://images.unsplash.com/photo-1489599088243-6f0b99066ce8?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1478720568477-b0e6f1e6888c?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=1600&h=900&fit=crop'
+    ];
+    return banners[Math.floor(Math.random() * banners.length)];
   }
 
   // Search dramas menggunakan suggest API
