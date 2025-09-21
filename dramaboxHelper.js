@@ -118,6 +118,30 @@ class DramaBoxHelper {
   // Get drama details from theater endpoint
   async getDramaDetails(dramaId) {
     try {
+      // Function to get random drama image
+      const getRandomDramaImage = () => {
+        const images = [
+          'https://images.unsplash.com/photo-1489599088243-6f0b99066ce8?w=400&h=600&fit=crop',
+          'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop',
+          'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=600&fit=crop',
+          'https://images.unsplash.com/photo-1478720568477-b0e6f1e6888c?w=400&h=600&fit=crop',
+          'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop'
+        ];
+        return images[Math.floor(Math.random() * images.length)];
+      };
+
+      // Function to get random drama banner
+      const getRandomDramaBanner = () => {
+        const banners = [
+          'https://images.unsplash.com/photo-1489599088243-6f0b99066ce8?w=1600&h=900&fit=crop',
+          'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&h=900&fit=crop',
+          'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=1600&h=900&fit=crop',
+          'https://images.unsplash.com/photo-1478720568477-b0e6f1e6888c?w=1600&h=900&fit=crop',
+          'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=1600&h=900&fit=crop'
+        ];
+        return banners[Math.floor(Math.random() * banners.length)];
+      };
+
       // Use theater endpoint to get drama details
       const data = {
         newChannelStyle: 1,
@@ -141,8 +165,8 @@ class DramaBoxHelper {
               id: drama.id || drama.bookId,
               title: drama.title || drama.bookTitle,
               description: drama.description || drama.intro || 'No description available',
-              thumbnail: drama.thumbnail || drama.cover || drama.bookCover || drama.poster || this.getRandomDramaImage(),
-              banner: drama.banner || drama.bigCover || drama.largeCover || drama.thumbnail || drama.cover || this.getRandomDramaBanner(),
+              thumbnail: drama.thumbnail || drama.cover || drama.bookCover || drama.poster || getRandomDramaImage(),
+              banner: drama.banner || drama.bigCover || drama.largeCover || drama.thumbnail || drama.cover || getRandomDramaBanner(),
               genre: drama.genre || drama.tag || 'Drama',
               country: drama.country || 'Unknown',
               year: drama.year || new Date().getFullYear(),
@@ -162,8 +186,8 @@ class DramaBoxHelper {
           id: dramaId,
           title: `Drama ${dramaId}`,
           description: 'Drama details will be available soon...',
-          thumbnail: this.getRandomDramaImage(),
-          banner: this.getRandomDramaBanner(),
+          thumbnail: getRandomDramaImage(),
+          banner: getRandomDramaBanner(),
           genre: 'Drama',
           country: 'Unknown',
           year: new Date().getFullYear(),

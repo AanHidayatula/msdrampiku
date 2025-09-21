@@ -40,6 +40,30 @@ router.get('/', async (req, res) => {
     // Get real drama data from DramaBox API
     const result = await dramaboxHelper.getLatestDramas(parseInt(page), parseInt(limit));
     
+    // Function to get random drama image
+    const getRandomDramaImage = () => {
+      const images = [
+        'https://images.unsplash.com/photo-1489599088243-6f0b99066ce8?w=400&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1478720568477-b0e6f1e6888c?w=400&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop'
+      ];
+      return images[Math.floor(Math.random() * images.length)];
+    };
+
+    // Function to get random drama banner
+    const getRandomDramaBanner = () => {
+      const banners = [
+        'https://images.unsplash.com/photo-1489599088243-6f0b99066ce8?w=1600&h=900&fit=crop',
+        'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&h=900&fit=crop',
+        'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=1600&h=900&fit=crop',
+        'https://images.unsplash.com/photo-1478720568477-b0e6f1e6888c?w=1600&h=900&fit=crop',
+        'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=1600&h=900&fit=crop'
+      ];
+      return banners[Math.floor(Math.random() * banners.length)];
+    };
+    
     let dramalist = [];
     if (result.success && result.data) {
       // Extract dramas from API response
@@ -48,8 +72,8 @@ router.get('/', async (req, res) => {
         id: drama.id || drama.bookId || `drama_${index + 1}`,
         title: drama.title || drama.bookTitle || `Drama Title ${index + 1}`,
         description: drama.description || drama.intro || 'A captivating story that will keep you entertained...',
-        thumbnail: drama.thumbnail || drama.cover || drama.bookCover || drama.poster || dramaboxHelper.getRandomDramaImage(),
-        banner: drama.banner || drama.bigCover || drama.largeCover || drama.thumbnail || drama.cover || dramaboxHelper.getRandomDramaBanner(),
+        thumbnail: drama.thumbnail || drama.cover || drama.bookCover || drama.poster || getRandomDramaImage(),
+        banner: drama.banner || drama.bigCover || drama.largeCover || drama.thumbnail || drama.cover || getRandomDramaBanner(),
         genre: drama.genre || drama.tag || ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
         country: drama.country || 'South Korea',
         year: drama.year || (2020 + Math.floor(Math.random() * 4)),
@@ -67,8 +91,8 @@ router.get('/', async (req, res) => {
         id: `drama_${(parseInt(page) - 1) * parseInt(limit) + index + 1}`,
         title: `Drama Title ${index + 1}`,
         description: 'A captivating story that will keep you entertained...',
-        thumbnail: dramaboxHelper.getRandomDramaImage(),
-        banner: dramaboxHelper.getRandomDramaBanner(),
+        thumbnail: getRandomDramaImage(),
+        banner: getRandomDramaBanner(),
         genre: ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
         country: 'South Korea',
         year: 2020 + Math.floor(Math.random() * 4),
@@ -163,7 +187,7 @@ router.get('/:id', async (req, res) => {
           id: index + 1,
           title: `Episode ${index + 1}`,
           duration: `${Math.floor(Math.random() * 20) + 40}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
-          thumbnail: dramaboxHelper.getRandomDramaImage(),
+          thumbnail: getRandomDramaImage(),
           releaseDate: new Date(2023, 0, index + 1).toISOString(),
           views: Math.floor(Math.random() * 100000) + 5000
         }))
