@@ -12,6 +12,7 @@ const detailRoute = require('./detail');
 const detailsRoute = require('./details');
 const dramaRoute = require('./drama');
 const searchRoute = require('./search');
+const getTokenRoute = require('./get-dramabox-token');
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Vercel default port
@@ -34,6 +35,7 @@ app.use('/api/detail', detailRoute);
 app.use('/api/details', detailsRoute);
 app.use('/api/drama', dramaRoute);
 app.use('/api/search', searchRoute);
+app.use('/get-token', getTokenRoute);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
