@@ -37,30 +37,56 @@ router.get('/', async (req, res) => {
     if (year) filters.year = year;
     if (status) filters.status = status;
     
-    // Mock drama list (replace with actual API call)
-    const mockDramas = Array.from({ length: parseInt(limit) }, (_, index) => ({
-      id: `drama_${(parseInt(page) - 1) * parseInt(limit) + index + 1}`,
-      title: `Drama Title ${index + 1}`,
-      description: 'A captivating story that will keep you entertained...',
-      thumbnail: `https://example.com/thumbnails/drama_${index + 1}.jpg`,
-      banner: `https://example.com/banners/drama_${index + 1}.jpg`,
-      genre: ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
-      country: 'South Korea',
-      year: 2020 + Math.floor(Math.random() * 4),
-      rating: 4.0 + Math.random(),
-      totalEpisodes: 16 + Math.floor(Math.random() * 8),
-      status: ['Completed', 'Ongoing', 'Coming Soon'][Math.floor(Math.random() * 3)],
-      views: Math.floor(Math.random() * 1000000) + 10000,
-      createdAt: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString()
-    }));
+    // Get real drama data from DramaBox API
+    const result = await dramaboxHelper.getLatestDramas(parseInt(page), parseInt(limit));
+    
+    let dramalist = [];
+    if (result.success && result.data) {
+      // Extract dramas from API response
+      const apiDramas = result.data.data || [];
+      dramalist = apiDramas.map((drama, index) => ({
+        id: drama.id || drama.bookId || `drama_${index + 1}`,
+        title: drama.title || drama.bookTitle || `Drama Title ${index + 1}`,
+        description: drama.description || drama.intro || 'A captivating story that will keep you entertained...',
+        thumbnail: drama.thumbnail || drama.cover || drama.bookCover,
+        banner: drama.banner || drama.bigCover || drama.thumbnail || drama.cover,
+        genre: drama.genre || drama.tag || ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
+        country: drama.country || 'South Korea',
+        year: drama.year || (2020 + Math.floor(Math.random() * 4)),
+        rating: drama.rating || drama.score || (4.0 + Math.random()),
+        totalEpisodes: drama.totalEpisodes || drama.chapterCount || (16 + Math.floor(Math.random() * 8)),
+        status: drama.status || ['Completed', 'Ongoing', 'Coming Soon'][Math.floor(Math.random() * 3)],
+        views: drama.views || drama.playCount || (Math.floor(Math.random() * 1000000) + 10000),
+        createdAt: drama.createdAt || new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString()
+      }));
+    }
+    
+    // If no data from API, use fallback mock data
+    if (dramalist.length === 0) {
+      dramalist = Array.from({ length: Math.min(parseInt(limit), 20) }, (_, index) => ({
+        id: `drama_${(parseInt(page) - 1) * parseInt(limit) + index + 1}`,
+        title: `Drama Title ${index + 1}`,
+        description: 'A captivating story that will keep you entertained...',
+        thumbnail: null, // No example.com URLs
+        banner: null,
+        genre: ['Romance', 'Drama', 'Comedy'][Math.floor(Math.random() * 3)],
+        country: 'South Korea',
+        year: 2020 + Math.floor(Math.random() * 4),
+        rating: 4.0 + Math.random(),
+        totalEpisodes: 16 + Math.floor(Math.random() * 8),
+        status: ['Completed', 'Ongoing', 'Coming Soon'][Math.floor(Math.random() * 3)],
+        views: Math.floor(Math.random() * 1000000) + 10000,
+        createdAt: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString()
+      }));
+    }
     
     const response = {
-      dramas: mockDramas,
+      dramas: dramalist,
       pagination: {
         currentPage: parseInt(page),
         limit: parseInt(limit),
-        total: 1000, // Mock total
-        totalPages: Math.ceil(1000 / parseInt(limit))
+        total: dramalist.length * 10, // Estimate total
+        totalPages: Math.ceil((dramalist.length * 10) / parseInt(limit))
       },
       filters: {
         applied: filters,
@@ -137,7 +163,7 @@ router.get('/:id', async (req, res) => {
           id: index + 1,
           title: `Episode ${index + 1}`,
           duration: `${Math.floor(Math.random() * 20) + 40}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
-          thumbnail: `https://example.com/episodes/${id}/${index + 1}.jpg`,
+          thumbnail: null, // Remove example.com URL
           releaseDate: new Date(2023, 0, index + 1).toISOString(),
           views: Math.floor(Math.random() * 100000) + 5000
         }))

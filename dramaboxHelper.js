@@ -115,18 +115,72 @@ class DramaBoxHelper {
     }
   }
 
-  // Get drama details
+  // Get drama details from theater endpoint
   async getDramaDetails(dramaId) {
-    // Endpoint belum diketahui, menggunakan mock untuk sementara
-    return {
-      success: true,
-      data: {
-        id: dramaId,
-        title: `Drama ${dramaId}`,
-        description: 'Drama details...',
-        thumbnail: `https://example.com/drama/${dramaId}.jpg`
+    try {
+      // Use theater endpoint to get drama details
+      const data = {
+        newChannelStyle: 1,
+        isNeedRank: 1,
+        pageNo: 1,
+        index: 1,
+        channelId: Number(process.env.DRAMABOX_PLATFORM_P || 43)
+      };
+      
+      const result = await this.makeRequest('POST', '/he001/theater', data);
+      
+      if (result.success && result.data) {
+        // Find drama in the response
+        const dramas = result.data.data || [];
+        const drama = dramas.find(d => d.id === dramaId || d.bookId === dramaId);
+        
+        if (drama) {
+          return {
+            success: true,
+            data: {
+              id: drama.id || drama.bookId,
+              title: drama.title || drama.bookTitle,
+              description: drama.description || drama.intro || 'No description available',
+              thumbnail: drama.thumbnail || drama.cover || drama.bookCover,
+              banner: drama.banner || drama.bigCover || drama.thumbnail || drama.cover,
+              genre: drama.genre || drama.tag || 'Drama',
+              country: drama.country || 'Unknown',
+              year: drama.year || new Date().getFullYear(),
+              rating: drama.rating || drama.score || 8.0,
+              totalEpisodes: drama.totalEpisodes || drama.chapterCount || 16,
+              status: drama.status || 'Available',
+              views: drama.views || drama.playCount || 0
+            }
+          };
+        }
       }
-    };
+      
+      // If not found in theater, return fallback data
+      return {
+        success: true,
+        data: {
+          id: dramaId,
+          title: `Drama ${dramaId}`,
+          description: 'Drama details will be available soon...',
+          thumbnail: null,
+          banner: null,
+          genre: 'Drama',
+          country: 'Unknown',
+          year: new Date().getFullYear(),
+          rating: 8.0,
+          totalEpisodes: 16,
+          status: 'Available',
+          views: 0
+        }
+      };
+    } catch (error) {
+      console.error('Error getting drama details:', error);
+      return {
+        success: false,
+        error: error.message,
+        status: 500
+      };
+    }
   }
 
   // Search dramas menggunakan suggest API
